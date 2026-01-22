@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAComPNG 操作マニュアル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; }
+        .section-title { border-left: 5px solid #4f46e5; padding-left: 1rem; }
+        .key { display: inline-block; padding: 0.1rem 0.4rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-size: 0.85em; color: #475569; }
+        .tag-sample { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px; }
+        .tag-blue { background-color: #3b82f6; color: white; }
+        .tag-orange { background-color: #f97316; color: white; }
+        .tag-red { background-color: #ef4444; color: white; }
+        .tag-gray { background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+        
+        /* 簡易モックアップ用スタイル */
+        .mock-window { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); background: white; }
+        .mock-header { background: #f8fafc; padding: 0.5rem; border-bottom: 1px solid #e2e8f0; display: flex; gap: 0.5rem; align-items: center; }
+        .mock-circle { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
+
+        /* タイムライン */
+        .timeline-item { position: relative; padding-bottom: 1.5rem; }
+        .timeline-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; border: 2px solid white; }
+        .timeline-item.latest::before { background: #4f46e5; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 leading-relaxed">
+
+    <!-- ヘッダー -->
+    <header class="bg-indigo-700 text-white py-8 shadow-md">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-2 flex items-center gap-3">
+                <i class="fas fa-search-plus"></i> METAComPNG <span class="text-sm font-normal opacity-80 bg-indigo-800 px-2 py-1 rounded">v16 対応版</span>
+            </h1>
+            <p class="text-indigo-100">ComfyUI Metadata Analyzer - 操作マニュアル</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- サイドナビゲーション -->
+        <aside class="lg:col-span-1">
+            <nav class="sticky top-6 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-500 mb-3 uppercase text-xs tracking-wider">Contents</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#intro" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">🔰 はじめに</a></li>
+                    <li><a href="#basic" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">📥 画像の読み込み</a></li>
+                    <li><a href="#filter" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">🔍 分析とフィルタリング</a></li>
+                    <li><a href="#db" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">💾 データベース機能 (DB)</a></li>
+                    <li><a href="#export" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">📋 コピーとCSV出力</a></li>
+                    <li><a href="#about" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">ℹ️ 開発について / 免責</a></li>
+                    <li><a href="#history" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition text-slate-500">🕒 更新履歴</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="lg:col-span-3 space-y-12">
+
+            <!-- はじめに -->
+            <section id="intro">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">はじめに</h2>
+                <p class="mb-4">
+                    <strong>METAComPNG（めたこんぴん）</strong>は、ComfyUIで生成された画像（PNG形式）に含まれるメタデータを解析し、ブラウザ上で管理・検索するためのツールです。
+                </p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm text-blue-800">
+                    <h4 class="font-bold mb-1"><i class="fas fa-shield-alt"></i> セキュリティについて</h4>
+                    <p>このアプリは完全な<strong>ローカル動作（HTMLファイル単独動作）</strong>です。読み込んだ画像や解析データが外部サーバーに送信されることは一切ありません。安心してお使いください。</p>
+                </div>
+            </section>
+
+            <!-- 画像の読み込み -->
+            <section id="basic">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">画像の読み込み</h2>
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <p class="mb-4">
+                            ComfyUIが出力したPNGファイルを、画面上の<strong>ドロップエリア</strong>にドラッグ＆ドロップするだけで解析が始まります。
+                        </p>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-slate-600 mb-4">
+                            <li>複数のファイルを一度に投入可能（数千枚でもOK）</li>
+                            <li>読み込み後も「追加エリア」にドロップしてリストに追加可能</li>
+                        </ul>
+                    </div>
+                    <div class="mock-window h-40 flex flex-col justify-center items-center bg-slate-50 border-dashed border-2 border-slate-300 text-slate-400">
+                        <div class="text-3xl mb-2">📥</div>
+                        <div class="text-xs font-bold">ここにPNGファイルをドロップ</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- フィルタリング -->
+            <section id="filter">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">分析とフィルタリング</h2>
+                <p class="mb-4">画像を読み込むと、プロンプトや使用モデル（LoRA含む）が自動的に集計され、画面上部の「分析パネル」に表示されます。</p>
+
+                <h3 class="text-lg font-bold text-slate-700 mt-6 mb-2">3色のフィルタリング状態</h3>
+                <p class="mb-4 text-sm">タグ（単語）をクリックするたびに状態が切り替わります。</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border rounded hidden md:table">
+                        <thead class="bg-slate-100 text-slate-600">
+                            <tr>
+                                <th class="p-3 border-b">状態</th>
+                                <th class="p-3 border-b">色</th>
+                                <th class="p-3 border-b">意味</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-3">1. 解除</td>
+                                <td class="p-3"><span class="tag-sample tag-gray">tag_name</span></td>
+                                <td class="p-3">フィルタしていません（デフォルト）。</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-3">2. 含む</td>
+                                <td class="p-3">
+                                    <span class="tag-sample tag-blue">tag_name</span>
+                                    <span class="text-xs text-slate-400">or</span>
+                                    <span class="tag-sample tag-orange">tag_name</span>
+                                </td>
+                                <td class="p-3">
+                                    このタグが含まれる画像のみ表示します。<br>
+                                    <span class="text-xs text-slate-500">※青はAND条件、オレンジはOR条件の時に表示されます。</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">3. 除外</td>
+                                <td class="p-3"><span class="tag-sample tag-red">tag_name</span></td>
+                                <td class="p-3">このタグが含まれる画像を<strong>隠します</strong>（マイナス検索）。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-700 mt-6 mb-2">AND / OR 切り替え</h3>
+                <p class="mb-4 text-sm">
+                    パネルの右上にあるボタンで、検索モードを切り替えられます。<br>
+                    <span class="key">ANDモード (青)</span>: 選択したタグを<strong>すべて</strong>含む画像を探します。<br>
+                    <span class="key">ORモード (橙)</span>: 選択したタグの<strong>いずれか</strong>を含む画像を探します。
+                </p>
+            </section>
+
+            <!-- データベース機能 -->
+            <section id="db">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">データベース機能 (DB)</h2>
+                <p class="mb-4">解析した大量のデータセットを、軽量なJSONファイルとして保存・復元できます。</p>
+
+                <div class="bg-indigo-50 p-5 rounded-lg border border-indigo-100 mb-6">
+                    <h3 class="font-bold text-indigo-800 mb-2"><i class="fas fa-save"></i> DB保存 (Thumb付)</h3>
+                    <p class="text-sm text-indigo-700 mb-2">
+                        画面右上の「💾 DB保存」ボタンを押すと、現在のリストをJSONファイルとしてダウンロードします。<br>
+                        <strong>v16の特徴:</strong> 元画像の代わりに<strong>軽量なサムネイル画像</strong>を自動生成してJSON内に埋め込みます。
+                    </p>
+                    <ul class="list-disc list-inside text-xs text-indigo-600 ml-2">
+                        <li>HDDが繋がっていない外出先でもサムネイル付きでリストを確認できます。</li>
+                        <li>ファイルサイズを抑えるため、サムネイルは軽量化されています。</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50 p-5 rounded-lg border border-green-100">
+                    <h3 class="font-bold text-green-800 mb-2"><i class="fas fa-folder-open"></i> DB読込</h3>
+                    <p class="text-sm text-green-700 mb-2">
+                        保存したJSONファイルをドロップエリアに投げ込むだけで、一瞬でリストを復元します。
+                    </p>
+                    <div class="mt-2 text-xs bg-white p-2 rounded border border-green-200">
+                        <span class="font-bold">💡 スマート復元機能:</span><br>
+                        DB読み込み直後は「低画質サムネイル」で表示されますが、後から<strong>元のPNGファイル</strong>をドロップすると、自動的に高画質なオリジナル画像にリンクし直されます。
+                    </div>
+                </div>
+            </section>
+
+            <!-- コピーとCSV -->
+            <section id="export">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">コピーとCSV出力</h2>
+                
+                <h3 class="text-lg font-bold text-slate-700 mt-4 mb-2">選択コピー</h3>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600 mb-4">
+                    <li>リスト左端のチェックボックスで画像を選択します。</li>
+                    <li>ヘッダーの <span class="key">📋 コピー</span> ボタンを押します。</li>
+                    <li>プロンプトやSeed値などの詳細情報がテキスト形式でクリップボードにコピーされます。</li>
+                </ol>
+
+                <h3 class="text-lg font-bold text-slate-700 mt-4 mb-2">CSVエクスポート</h3>
+                <p class="text-sm text-slate-600">
+                    <span class="key">💾 CSV</span> ボタンを押すと、Excelなどで開ける一覧データをダウンロードします。
+                </p>
+            </section>
+
+            <!-- 開発について -->
+            <section id="about">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">開発について / 免責</h2>
+                
+                <div class="bg-white border border-slate-200 rounded p-6 shadow-sm mb-6">
+                    <h4 class="font-bold text-slate-700 mb-2"><i class="fas fa-lightbulb"></i> 開発の動機</h4>
+                    <p class="text-sm text-slate-600 mb-4">
+                        Stable Diffusion (WebUI) には便利なメタデータ閲覧ソフトが数多く存在しますが、ComfyUI専用の使いやすいビューアーが見当たらなかったため、<strong>「無いなら作ろう」</strong> とGeminiに開発を依頼し、誕生しました。
+                    </p>
+                    
+                    <h4 class="font-bold text-slate-700 mb-2"><i class="fas fa-laptop-house"></i> 完全ローカルでの利用</h4>
+                    <p class="text-sm text-slate-600 mb-4">
+                        このアプリの実体は、たった一つのHTMLファイルです。ブラウザの「名前を付けて保存」でデスクトップ等に保存すれば、<strong>インターネット接続がない環境でも、完全ローカルアプリとして動作します。</strong>
+                    </p>
+
+                    <h4 class="font-bold text-slate-700 mb-2"><i class="fas fa-tools"></i> カスタマイズについて</h4>
+                    <p class="text-sm text-slate-600 mb-4">
+                        アプリに不満や要望がある場合は、保存したHTMLファイルをGeminiにアップロードし、<strong>「ここを直して」と伝えるだけで修正・改良が可能</strong>です。あなただけの最強ツールに育ててください。
+                    </p>
+                </div>
+
+                <div class="bg-red-50 border border-red-200 rounded p-4 text-xs text-red-800">
+                    <h5 class="font-bold mb-1">⚠️ 免責事項</h5>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>本アプリケーションの使用により発生したいかなる損害・不具合についても、開発者およびAIは責任を負いかねます。あらかじめご了承ください。</li>
+                        <li>改変・再配布は自由ですが、その際の責任は改変・再配布者が負うものとします。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 更新履歴 -->
+            <section id="history">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 section-title">更新履歴</h2>
+                <div class="border-l-2 border-slate-200 ml-3 pl-6 space-y-6">
+                    
+                    <div class="timeline-item latest">
+                        <h4 class="font-bold text-indigo-700">v16.1</h4>
+                        <p class="text-xs text-slate-500 mb-1">Current Version</p>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>正式名称を「METAComPNG（めたこんぴん）」に決定。</li>
+                            <li>画面ヘッダーに操作マニュアルへのリンクを追加。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v16: Thumbnail DB</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>DB保存機能の強化:</strong> 軽量サムネイル埋め込み機能を追加。元画像がない環境でもリスト確認が可能に。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v15: Database & Incremental</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>JSON DB機能:</strong> 解析結果の保存・復元に対応。</li>
+                            <li><strong>追加読み込み:</strong> データ保持したままの追加ドロップに対応。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v14: Translation & Fixes</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>Google翻訳リンク:</strong> タグ横に[訳]ボタンを追加。</li>
+                            <li><strong>プロンプト解析修正:</strong> 改行を区切り文字として認識、アンダーバーで始まるタグの保持。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v13: Copy & Normalize</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>正規化強化:</strong> 半角スペースをアンダーバー `_` に統一（SD準拠）。</li>
+                            <li><strong>コピー機能:</strong> タグ一覧の一括コピー、セル内プロンプトのワンクリックコピー実装。</li>
+                            <li>ネガティブプロンプトの表示レイアウト修正。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v12: Date & Clickable</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>全タグ表示モード:</strong> 絞り込み中もタグリストを隠さないオプションを追加（OR検索用）。</li>
+                            <li><strong>タグ検索:</strong> 大量のタグから検索する機能。</li>
+                            <li><strong>クリッカブル・テーブル:</strong> 一覧表内の単語をクリックしてフィルタ可能に。</li>
+                            <li>生成日時（更新日時）の取得とソート対応。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v11: AND/OR Logic</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>プロンプトとLoRAフィルタに「AND/OR」切り替えスイッチを実装。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v10: Incremental UI</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>画像読み込み後もドロップゾーンを維持し、連続した追加読み込みを可能に。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v9: Tag Fix</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>エスケープ文字 `\(` `\)` を含むタグ（LoRAトリガーワード等）が正しく認識されない不具合を修正。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v8: Metadata Fix</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>メタデータ読み込みロジックの修正（Workflow情報ではなくAPI生成情報を優先取得するよう変更）。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v7: Layout & Selection</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>LoRA相関分析:</strong> LoRAフィルタ時に、プロンプト一覧をそのLoRA使用画像のものだけに再集計する機能（トリガーワード特定用）。</li>
+                            <li>レイアウト分離（Steps, CFG等の列独立）、マウスオーバーでの全文表示。</li>
+                            <li>チェックボックスによる選択と、選択アイテムのみのCSV出力・コピー。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v6: Advanced Analysis</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>詳細分析パネル:</strong> 全タグの集計表示、3ステートフィルタ（含む/除外/解除）。</li>
+                            <li>ソート機能の実装。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v5: Complete Base</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>サムネイルのホバー拡大（縦横比維持）、クリックでの画像オープン。</li>
+                            <li>CR LoRA Stack等のカスタムノード対応（LoRA名のあいまい検索）。</li>
+                            <li>プロンプトの整形（連続スペース削除など）。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v4: Thumbnails</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>サムネイル表示の実装（遅延読み込み対応）。</li>
+                            <li>メモリ解放処理の追加。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v3: Link Tracing</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>ノード追跡:</strong> Easy Seedなどのカスタムノードへのリンクを追跡し、値を特定するロジックを実装。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v2: Generic Parsing</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>汎用解析モードの実装（特定のノード名に依存せず、SeedやStepsといったパラメータ名から値を探索）。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v1: Prototype</h4>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li>プロジェクト始動。クライアントサイドJavaScriptのみでのComfyUIメタデータ解析・CSV出力を実現。</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm mt-12">
+        <p>METAComPNG - ComfyUI Metadata Analyzer</p>
+        <p class="text-xs mt-1 opacity-50">Designed for Local Use.</p>
+    </footer>
+
+</body>
+</html>
