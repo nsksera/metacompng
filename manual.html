@@ -4,15 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>METAComPNG 操作マニュアル</title>
+    
+    <!-- フォント読み込み (アプリと統一) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; }
-        .section-title { border-left: 5px solid #4f46e5; padding-left: 1rem; }
+        body { 
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; 
+            color: #334155; /* Slate-700 */
+        }
+        
+        /* 見出しに丸文字を適用 */
+        h1, h2, h3, h4 {
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        /* リンク色など */
+        a { color: #7c3aed; transition: color 0.2s; } /* Violet-600 */
+        a:hover { color: #fb923c; } /* Orange-400 */
+
+        /* セクション見出し (META紫) */
+        .section-title { 
+            border-left: 5px solid #a78bfa; /* Violet-400 */
+            padding-left: 1rem; 
+            color: #4c1d95; /* Violet-900 */
+        }
+        
         .key { display: inline-block; padding: 0.1rem 0.4rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-size: 0.85em; color: #475569; }
         .tag-sample { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px; }
         .tag-blue { background-color: #3b82f6; color: white; }
-        .tag-orange { background-color: #f97316; color: white; }
+        .tag-orange { background-color: #fb923c; color: white; } /* Logo Orange */
         .tag-red { background-color: #ef4444; color: white; }
         .tag-gray { background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
         
@@ -24,18 +49,65 @@
         /* タイムライン */
         .timeline-item { position: relative; padding-bottom: 1.5rem; }
         .timeline-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; border: 2px solid white; }
-        .timeline-item.latest::before { background: #4f46e5; }
+        .timeline-item.latest::before { background: #22d3ee; } /* Cyan (Com color) */
+
+        /* ロゴ用スタイル (SVG内) */
+        .logo-jp { font-family: 'Zen Maru Gothic', sans-serif; fill: #fff; font-size: 34px; font-weight: bold; text-anchor: middle; }
+        .logo-en { font-family: 'Fredoka One', cursive; font-size: 20px; text-anchor: middle; letter-spacing: 1px; }
+        .fill-meta { fill: #a78bfa; } 
+        .fill-com  { fill: #22d3ee; } 
+        .fill-png  { fill: #fb923c; } 
+        .logo-sub { font-family: sans-serif; fill: #94a3b8; font-size: 8px; font-weight: bold; letter-spacing: 0.5px; text-anchor: middle; }
+        .logo-wire { fill: none; stroke: #64748b; stroke-width: 3; stroke-linecap: round; }
+        .logo-wire-active { stroke: #a78bfa; stroke-dasharray: 6 4; animation: flow 1s linear infinite; }
+        @keyframes flow { to { stroke-dashoffset: -10; } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 leading-relaxed">
+<body class="bg-slate-50 leading-relaxed pb-20">
 
-    <!-- ヘッダー -->
-    <header class="bg-indigo-700 text-white py-8 shadow-md">
-        <div class="container mx-auto px-6">
-            <h1 class="text-3xl font-bold mb-2 flex items-center gap-3">
-                <i class="fas fa-search-plus"></i> METAComPNG <span class="text-sm font-normal opacity-80 bg-indigo-800 px-2 py-1 rounded">v16 対応版</span>
-            </h1>
-            <p class="text-indigo-100">ComfyUI Metadata Analyzer - 操作マニュアル</p>
+    <!-- ヘッダー (アプリ本体と統一) -->
+    <header class="bg-slate-700 text-white py-6 shadow-md border-b-4 border-slate-600">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-4">
+            <!-- ロゴSVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" class="h-24 w-auto drop-shadow-lg">
+                <!-- マスコット -->
+                <g transform="translate(40, 20)">
+                    <rect x="0" y="0" width="50" height="60" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                    <path d="M0 8 C0 4 4 0 8 0 L42 0 C46 0 50 4 50 8 L50 15 L0 15 Z" fill="#3b82f6" opacity="0.8"/>
+                    <circle cx="15" cy="35" r="2" fill="#334155"/>
+                    <circle cx="35" cy="35" r="2" fill="#334155"/>
+                    <path d="M22 42 Q25 45 28 42" fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="-5" cy="20" r="4" fill="#ef4444"/>
+                    <circle cx="-5" cy="40" r="4" fill="#22c55e"/>
+                    <circle cx="55" cy="30" r="4" fill="#a78bfa"/>
+                </g>
+                <!-- ワイヤー -->
+                <path d="M95 50 C 110 50, 110 55, 125 55" class="logo-wire logo-wire-active" />
+                <circle cx="125" cy="55" r="3" fill="#a78bfa"/>
+                <!-- 3ブロック構成 -->
+                <g transform="translate(0, 0)">
+                    <g transform="translate(165, 0)">
+                        <text x="0" y="52" class="logo-jp">めた</text>
+                        <text x="0" y="75" class="logo-en fill-meta">META</text>
+                        <text x="0" y="92" class="logo-sub">ComfyUI</text>
+                    </g>
+                    <g transform="translate(240, 0)">
+                        <text x="0" y="52" class="logo-jp">こん</text>
+                        <text x="0" y="75" class="logo-en fill-com">Com</text>
+                        <text x="0" y="92" class="logo-sub">Metadata</text>
+                    </g>
+                    <g transform="translate(315, 0)">
+                        <text x="0" y="52" class="logo-jp">ぴん</text>
+                        <text x="0" y="75" class="logo-en fill-png">PNG</text>
+                        <text x="0" y="92" class="logo-sub">Analyzer</text>
+                    </g>
+                </g>
+            </svg>
+            
+            <div class="mt-2 md:mt-0 md:ml-6 text-center md:text-left">
+                <h1 class="text-2xl font-bold text-slate-100 tracking-wide font-sans">操作マニュアル</h1>
+                <p class="text-slate-400 text-sm">v16 以降対応版</p>
+            </div>
         </div>
     </header>
 
@@ -44,15 +116,15 @@
         <!-- サイドナビゲーション -->
         <aside class="lg:col-span-1">
             <nav class="sticky top-6 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                <h3 class="font-bold text-slate-500 mb-3 uppercase text-xs tracking-wider">Contents</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#intro" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">🔰 はじめに</a></li>
-                    <li><a href="#basic" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">📥 画像の読み込み</a></li>
-                    <li><a href="#filter" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">🔍 分析とフィルタリング</a></li>
-                    <li><a href="#db" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">💾 データベース機能 (DB)</a></li>
-                    <li><a href="#export" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">📋 コピーとCSV出力</a></li>
-                    <li><a href="#about" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition">ℹ️ 開発について / 免責</a></li>
-                    <li><a href="#history" class="block hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition text-slate-500">🕒 更新履歴</a></li>
+                <h3 class="font-bold text-slate-400 mb-3 uppercase text-xs tracking-wider">Contents</h3>
+                <ul class="space-y-2 text-sm font-medium">
+                    <li><a href="#intro" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">🔰 はじめに</a></li>
+                    <li><a href="#basic" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">📥 画像の読み込み</a></li>
+                    <li><a href="#filter" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">🔍 分析とフィルタリング</a></li>
+                    <li><a href="#db" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition text-indigo-600">💾 データベース機能 (DB)</a></li>
+                    <li><a href="#export" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">📋 コピーとCSV出力</a></li>
+                    <li><a href="#about" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">ℹ️ 開発について / 免責</a></li>
+                    <li><a href="#history" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition text-slate-400">🕒 更新履歴</a></li>
                 </ul>
             </nav>
         </aside>
@@ -62,19 +134,19 @@
 
             <!-- はじめに -->
             <section id="intro">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">はじめに</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">はじめに</h2>
                 <p class="mb-4">
                     <strong>METAComPNG（めたこんぴん）</strong>は、ComfyUIで生成された画像（PNG形式）に含まれるメタデータを解析し、ブラウザ上で管理・検索するためのツールです。
                 </p>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm text-blue-800">
-                    <h4 class="font-bold mb-1"><i class="fas fa-shield-alt"></i> セキュリティについて</h4>
+                <div class="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded text-sm text-indigo-900">
+                    <h4 class="font-bold mb-1 flex items-center gap-2"><i class="fas fa-shield-alt"></i> セキュリティについて</h4>
                     <p>このアプリは完全な<strong>ローカル動作（HTMLファイル単独動作）</strong>です。読み込んだ画像や解析データが外部サーバーに送信されることは一切ありません。安心してお使いください。</p>
                 </div>
             </section>
 
             <!-- 画像の読み込み -->
             <section id="basic">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">画像の読み込み</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">画像の読み込み</h2>
                 <div class="grid md:grid-cols-2 gap-6 items-center">
                     <div>
                         <p class="mb-4">
@@ -94,7 +166,7 @@
 
             <!-- フィルタリング -->
             <section id="filter">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">分析とフィルタリング</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">分析とフィルタリング</h2>
                 <p class="mb-4">画像を読み込むと、プロンプトや使用モデル（LoRA含む）が自動的に集計され、画面上部の「分析パネル」に表示されます。</p>
 
                 <h3 class="text-lg font-bold text-slate-700 mt-6 mb-2">3色のフィルタリング状態</h3>
@@ -146,27 +218,27 @@
 
             <!-- データベース機能 -->
             <section id="db">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">データベース機能 (DB)</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">データベース機能 (DB)</h2>
                 <p class="mb-4">解析した大量のデータセットを、軽量なJSONファイルとして保存・復元できます。</p>
 
-                <div class="bg-indigo-50 p-5 rounded-lg border border-indigo-100 mb-6">
-                    <h3 class="font-bold text-indigo-800 mb-2"><i class="fas fa-save"></i> DB保存 (Thumb付)</h3>
-                    <p class="text-sm text-indigo-700 mb-2">
+                <div class="bg-violet-50 p-5 rounded-lg border border-violet-100 mb-6">
+                    <h3 class="font-bold text-violet-800 mb-2 text-lg"><i class="fas fa-save"></i> DB保存 (Thumb付)</h3>
+                    <p class="text-sm text-violet-900 mb-2">
                         画面右上の「💾 DB保存」ボタンを押すと、現在のリストをJSONファイルとしてダウンロードします。<br>
                         <strong>v16の特徴:</strong> 元画像の代わりに<strong>軽量なサムネイル画像</strong>を自動生成してJSON内に埋め込みます。
                     </p>
-                    <ul class="list-disc list-inside text-xs text-indigo-600 ml-2">
+                    <ul class="list-disc list-inside text-xs text-violet-700 ml-2">
                         <li>HDDが繋がっていない外出先でもサムネイル付きでリストを確認できます。</li>
                         <li>ファイルサイズを抑えるため、サムネイルは軽量化されています。</li>
                     </ul>
                 </div>
 
-                <div class="bg-green-50 p-5 rounded-lg border border-green-100">
-                    <h3 class="font-bold text-green-800 mb-2"><i class="fas fa-folder-open"></i> DB読込</h3>
-                    <p class="text-sm text-green-700 mb-2">
+                <div class="bg-cyan-50 p-5 rounded-lg border border-cyan-100">
+                    <h3 class="font-bold text-cyan-800 mb-2 text-lg"><i class="fas fa-folder-open"></i> DB読込</h3>
+                    <p class="text-sm text-cyan-900 mb-2">
                         保存したJSONファイルをドロップエリアに投げ込むだけで、一瞬でリストを復元します。
                     </p>
-                    <div class="mt-2 text-xs bg-white p-2 rounded border border-green-200">
+                    <div class="mt-2 text-xs bg-white p-3 rounded border border-cyan-200 text-cyan-800 shadow-sm">
                         <span class="font-bold">💡 スマート復元機能:</span><br>
                         DB読み込み直後は「低画質サムネイル」で表示されますが、後から<strong>元のPNGファイル</strong>をドロップすると、自動的に高画質なオリジナル画像にリンクし直されます。
                     </div>
@@ -175,7 +247,7 @@
 
             <!-- コピーとCSV -->
             <section id="export">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">コピーとCSV出力</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">コピーとCSV出力</h2>
                 
                 <h3 class="text-lg font-bold text-slate-700 mt-4 mb-2">選択コピー</h3>
                 <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600 mb-4">
@@ -192,7 +264,7 @@
 
             <!-- 開発について -->
             <section id="about">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">開発について / 免責</h2>
+                <h2 class="text-2xl font-bold mb-4 section-title">開発について / 免責</h2>
                 
                 <div class="bg-white border border-slate-200 rounded p-6 shadow-sm mb-6">
                     <h4 class="font-bold text-slate-700 mb-2"><i class="fas fa-lightbulb"></i> 開発の動機</h4>
@@ -211,7 +283,7 @@
                     </p>
                 </div>
 
-                <div class="bg-red-50 border border-red-200 rounded p-4 text-xs text-red-800">
+                <div class="bg-orange-50 border border-orange-200 rounded p-4 text-xs text-orange-900">
                     <h5 class="font-bold mb-1">⚠️ 免責事項</h5>
                     <ul class="list-disc list-inside space-y-1">
                         <li>本アプリケーションの使用により発生したいかなる損害・不具合についても、開発者およびAIは責任を負いかねます。あらかじめご了承ください。</li>
@@ -222,15 +294,16 @@
 
             <!-- 更新履歴 -->
             <section id="history">
-                <h2 class="text-2xl font-bold text-slate-800 mb-6 section-title">更新履歴</h2>
+                <h2 class="text-2xl font-bold mb-6 section-title">更新履歴</h2>
                 <div class="border-l-2 border-slate-200 ml-3 pl-6 space-y-6">
                     
                     <div class="timeline-item latest">
-                        <h4 class="font-bold text-indigo-700">v16.1</h4>
+                        <h4 class="font-bold text-violet-700">v16.1 ~ 16.8</h4>
                         <p class="text-xs text-slate-500 mb-1">Current Version</p>
                         <ul class="list-disc list-inside text-sm text-slate-600">
                             <li>正式名称を「METAComPNG（めたこんぴん）」に決定。</li>
                             <li>画面ヘッダーに操作マニュアルへのリンクを追加。</li>
+                            <li>ロゴデザインと配色を刷新（v16.8）。</li>
                         </ul>
                     </div>
 
@@ -365,8 +438,8 @@
         </main>
     </div>
 
-    <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm mt-12">
-        <p>METAComPNG - ComfyUI Metadata Analyzer</p>
+    <footer class="bg-slate-700 text-slate-400 py-6 text-center text-sm mt-12 font-sans border-t border-slate-600">
+        <p class="font-bold text-slate-300">METAComPNG - ComfyUI Metadata Analyzer</p>
         <p class="text-xs mt-1 opacity-50">Designed for Local Use.</p>
     </footer>
 
