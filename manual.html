@@ -70,7 +70,6 @@
         <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-4">
             <!-- ロゴSVG -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" class="h-24 w-auto drop-shadow-lg">
-                <!-- マスコット -->
                 <g transform="translate(40, 20)">
                     <rect x="0" y="0" width="50" height="60" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
                     <path d="M0 8 C0 4 4 0 8 0 L42 0 C46 0 50 4 50 8 L50 15 L0 15 Z" fill="#3b82f6" opacity="0.8"/>
@@ -81,10 +80,8 @@
                     <circle cx="-5" cy="40" r="4" fill="#22c55e"/>
                     <circle cx="55" cy="30" r="4" fill="#a78bfa"/>
                 </g>
-                <!-- ワイヤー -->
                 <path d="M95 50 C 110 50, 110 55, 125 55" class="logo-wire logo-wire-active" />
                 <circle cx="125" cy="55" r="3" fill="#a78bfa"/>
-                <!-- 3ブロック構成 -->
                 <g transform="translate(0, 0)">
                     <g transform="translate(165, 0)">
                         <text x="0" y="52" class="logo-jp">めた</text>
@@ -106,7 +103,7 @@
             
             <div class="mt-2 md:mt-0 md:ml-6 text-center md:text-left">
                 <h1 class="text-2xl font-bold text-slate-100 tracking-wide font-sans">操作マニュアル</h1>
-                <p class="text-slate-400 text-sm">v16 以降対応版</p>
+                <p class="text-slate-400 text-sm">v18 以降対応版</p>
             </div>
         </div>
     </header>
@@ -121,7 +118,7 @@
                     <li><a href="#intro" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">🔰 はじめに</a></li>
                     <li><a href="#basic" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">📥 画像の読み込み</a></li>
                     <li><a href="#filter" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">🔍 分析とフィルタリング</a></li>
-                    <li><a href="#db" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition text-indigo-600">💾 データベース機能 (DB)</a></li>
+                    <li><a href="#db" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition text-indigo-600">💾 DB保存 (選別機能)</a></li>
                     <li><a href="#export" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">📋 コピーとCSV出力</a></li>
                     <li><a href="#about" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition">ℹ️ 開発について / 免責</a></li>
                     <li><a href="#history" class="block hover:bg-slate-50 px-2 py-1.5 rounded transition text-slate-400">🕒 更新履歴</a></li>
@@ -136,7 +133,8 @@
             <section id="intro">
                 <h2 class="text-2xl font-bold mb-4 section-title">はじめに</h2>
                 <p class="mb-4">
-                    <strong>METAComPNG（めたこんぴん）</strong>は、ComfyUIで生成された画像（PNG形式）に含まれるメタデータを解析し、ブラウザ上で管理・検索するためのツールです。
+                    <strong>METAComPNG（めたこんぴん）</strong>は、AIで生成された画像（PNG形式）に含まれるメタデータを解析し、ブラウザ上で管理・検索するためのツールです。<br>
+                    <strong>ComfyUI</strong> だけでなく、<strong>Stable Diffusion WebUI (A1111)</strong> で生成された画像にも対応しています。
                 </p>
                 <div class="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded text-sm text-indigo-900">
                     <h4 class="font-bold mb-1 flex items-center gap-2"><i class="fas fa-shield-alt"></i> セキュリティについて</h4>
@@ -150,17 +148,27 @@
                 <div class="grid md:grid-cols-2 gap-6 items-center">
                     <div>
                         <p class="mb-4">
-                            ComfyUIが出力したPNGファイルを、画面上の<strong>ドロップエリア</strong>にドラッグ＆ドロップするだけで解析が始まります。
+                            出力されたPNGファイルを、画面上の<strong>ドロップエリア</strong>にドラッグ＆ドロップするだけで解析が始まります。
                         </p>
                         <ul class="list-disc list-inside space-y-2 text-sm text-slate-600 mb-4">
-                            <li>複数のファイルを一度に投入可能（数千枚でもOK）</li>
-                            <li>読み込み後も「追加エリア」にドロップしてリストに追加可能</li>
+                            <li>複数のファイルを一度に投入可能（数千枚でも高速に処理します）。</li>
+                            <li><strong>混合ドロップOK:</strong> ComfyUIとStable Diffusionの画像が混ざっていても自動判別します。</li>
+                            <li>読み込み後も「追加エリア」にドロップしてリストに追加可能です。</li>
                         </ul>
                     </div>
                     <div class="mock-window h-40 flex flex-col justify-center items-center bg-slate-50 border-dashed border-2 border-slate-300 text-slate-400">
                         <div class="text-3xl mb-2">📥</div>
                         <div class="text-xs font-bold">ここにPNGファイルをドロップ</div>
                     </div>
+                </div>
+                
+                <h3 class="text-lg font-bold mt-6 mb-2">ツールの判別</h3>
+                <p class="text-sm text-slate-600 mb-4">
+                    リスト上の「Tool」列に表示されるアイコンで、どちらの環境で生成されたか一目でわかります。
+                </p>
+                <div class="flex gap-4">
+                    <span class="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded text-sm"><span class="text-lg">⚡</span> ComfyUI</span>
+                    <span class="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded text-sm"><span class="text-lg">🖥️</span> Stable Diffusion</span>
                 </div>
             </section>
 
@@ -222,14 +230,13 @@
                 <p class="mb-4">解析した大量のデータセットを、軽量なJSONファイルとして保存・復元できます。</p>
 
                 <div class="bg-violet-50 p-5 rounded-lg border border-violet-100 mb-6">
-                    <h3 class="font-bold text-violet-800 mb-2 text-lg"><i class="fas fa-save"></i> DB保存 (Thumb付)</h3>
+                    <h3 class="font-bold text-violet-800 mb-2 text-lg"><i class="fas fa-save"></i> DB保存 (選別機能付き)</h3>
                     <p class="text-sm text-violet-900 mb-2">
-                        画面右上の「💾 DB保存」ボタンを押すと、現在のリストをJSONファイルとしてダウンロードします。<br>
-                        <strong>v16の特徴:</strong> 元画像の代わりに<strong>軽量なサムネイル画像</strong>を自動生成してJSON内に埋め込みます。
+                        画面右上の「💾 DB保存」ボタンを押すと、<strong>現在リストに表示されている画像だけ</strong>をJSONファイルとして保存します。
                     </p>
-                    <ul class="list-disc list-inside text-xs text-violet-700 ml-2">
-                        <li>HDDが繋がっていない外出先でもサムネイル付きでリストを確認できます。</li>
-                        <li>ファイルサイズを抑えるため、サムネイルは軽量化されています。</li>
+                    <ul class="list-disc list-inside text-xs text-violet-700 ml-2 space-y-1">
+                        <li><strong>選別保存:</strong> 不要な画像をフィルタで除外してから保存すれば、お気に入りだけのデータセットが作れます。</li>
+                        <li><strong>サムネイル埋め込み:</strong> 元画像の代わりに軽量なサムネイルを生成して埋め込むため、元画像がない環境でもリスト確認が可能です。</li>
                     </ul>
                 </div>
 
@@ -260,6 +267,26 @@
                 <p class="text-sm text-slate-600">
                     <span class="key">💾 CSV</span> ボタンを押すと、Excelなどで開ける一覧データをダウンロードします。
                 </p>
+            </section>
+
+            <!-- Tips -->
+            <section id="tips">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 section-title">Tips / 仕様</h2>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="border p-4 rounded bg-white">
+                        <h4 class="font-bold text-sm mb-2 text-indigo-600">🔍 どこでも拡大プレビュー</h4>
+                        <p class="text-xs text-slate-600">
+                            リストのサムネイル画像にマウスを乗せると、画面上のどの位置にあっても<strong>最前面に</strong>拡大ポップアップが表示されます。画面端でも切れません。
+                        </p>
+                    </div>
+                    <div class="border p-4 rounded bg-white">
+                        <h4 class="font-bold text-sm mb-2 text-indigo-600">🌐 翻訳機能</h4>
+                        <p class="text-xs text-slate-600">
+                            分析パネルの各タグ横にある小さな <span class="bg-slate-200 text-slate-500 rounded-full w-4 h-4 inline-flex items-center justify-center text-[9px] font-bold">訳</span> ボタンを押すと、Google翻訳が別タブで開きます。
+                        </p>
+                    </div>
+                </div>
             </section>
 
             <!-- 開発について -->
@@ -298,12 +325,23 @@
                 <div class="border-l-2 border-slate-200 ml-3 pl-6 space-y-6">
                     
                     <div class="timeline-item latest">
-                        <h4 class="font-bold text-violet-700">v16.1 ~ 16.8</h4>
-                        <p class="text-xs text-slate-500 mb-1">Current Version</p>
+                        <h4 class="font-bold text-violet-700">v18: Speed & SD Support</h4>
+                        <p class="text-xs text-slate-500 mb-1">Performance Update</p>
+                        <ul class="list-disc list-inside text-sm text-slate-600">
+                            <li><strong>Stable Diffusion対応:</strong> WebUI (A1111) で生成された画像のメタデータ解析に対応。</li>
+                            <li><strong>高速化:</strong> 大量の画像を読み込んだ際のフィルタリング速度を劇的に改善。</li>
+                            <li><strong>Toolフィルタ:</strong> ComfyUI / Stable Diffusion を区別して絞り込む機能を追加。</li>
+                            <li><strong>フローティング・プレビュー:</strong> 拡大画像が画面端で切れないよう、表示位置を自動調整する機能を追加。</li>
+                            <li><strong>選別保存:</strong> DB保存時、フィルタリング結果のみを保存するように仕様変更。</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-slate-700">v16.1 ~ v16.8</h4>
                         <ul class="list-disc list-inside text-sm text-slate-600">
                             <li>正式名称を「METAComPNG（めたこんぴん）」に決定。</li>
                             <li>画面ヘッダーに操作マニュアルへのリンクを追加。</li>
-                            <li>ロゴデザインと配色を刷新（v16.8）。</li>
+                            <li>ロゴデザインと配色を刷新。</li>
                         </ul>
                     </div>
 

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAComPNG v16.8</title>
+    <title>METAComPNG v18 (SD & Speed)</title>
     
-    <!-- フォント読み込み -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
@@ -14,52 +14,39 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [v-cloak] { display: none; }
+        body { font-family: sans-serif; }
         .drag-active { border-color: #3b82f6; background-color: #eff6ff; }
         td, th { padding: 0.5rem; font-size: 0.75rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
         
-        /* スクロールバー装飾 */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
 
-        /* ロゴ用スタイル */
-        .logo-jp { 
-            font-family: 'Zen Maru Gothic', sans-serif; 
-            fill: #fff; 
-            font-size: 34px; 
-            font-weight: bold; 
-            text-anchor: middle; 
-        }
-        .logo-en { 
-            font-family: 'Fredoka One', cursive; 
-            font-size: 20px; 
-            text-anchor: middle; 
-            letter-spacing: 1px;
-        }
-        /* 各パートの色定義 */
-        .fill-meta { fill: #a78bfa; } /* 紫 (Violet-400) */
-        .fill-com  { fill: #22d3ee; } /* 水色 (Cyan-400) */
-        .fill-png  { fill: #fb923c; } /* オレンジ (Orange-400) */
-
-        .logo-sub { 
-            font-family: sans-serif; 
-            fill: #94a3b8; 
-            font-size: 8px; 
-            font-weight: bold; 
-            letter-spacing: 0.5px; 
-            text-anchor: middle;
-        }
-        
+        /* Logo Styles */
+        .logo-jp { font-family: 'Zen Maru Gothic', sans-serif; fill: #fff; font-size: 34px; font-weight: bold; text-anchor: middle; }
+        .logo-en { font-family: 'Fredoka One', cursive; font-size: 20px; text-anchor: middle; letter-spacing: 1px; }
+        .fill-meta { fill: #a78bfa; } 
+        .fill-com  { fill: #22d3ee; } 
+        .fill-png  { fill: #fb923c; } 
+        .logo-sub { font-family: sans-serif; fill: #94a3b8; font-size: 8px; font-weight: bold; letter-spacing: 0.5px; text-anchor: middle; }
         .logo-wire { fill: none; stroke: #64748b; stroke-width: 3; stroke-linecap: round; }
         .logo-wire-active { stroke: #a78bfa; stroke-dasharray: 6 4; animation: flow 1s linear infinite; }
         @keyframes flow { to { stroke-dashoffset: -10; } }
 
-        /* サムネイル関連 */
-        .thumb-wrap { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 4px; border: 1px solid #e2e8f0; }
-        .thumb-img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer; }
-        .thumb-wrap:hover .thumb-img { position: absolute; top: -10px; left: 0; width: auto; height: auto; max-width: 400px; min-width: 150px; z-index: 50; box-shadow: 0 10px 25px rgba(0,0,0,0.5); object-fit: contain; background: white; border-radius: 4px; border: 1px solid #cbd5e1; }
+        /* Thumbnails */
+        .thumb-wrap { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 4px; border: 1px solid #e2e8f0; cursor: pointer; }
+        .thumb-img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
         
-        /* フィルタボタン */
+        /* Floating Preview */
+        .float-preview {
+            position: fixed; z-index: 9999; pointer-events: none;
+            background: white; border: 1px solid #cbd5e1; border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); padding: 2px;
+            max-width: 400px; max-height: 400px; object-fit: contain;
+            transition: opacity 0.1s;
+        }
+
+        /* Filter Buttons */
         .btn-tag { transition: all 0.1s; border: 1px solid transparent; }
         .state-off { background-color: #f8fafc; color: #64748b; border-color: #e2e8f0; }
         .state-include { background-color: #3b82f6; color: white; border-color: #2563eb; }
@@ -85,15 +72,15 @@
 <body class="bg-slate-50 text-slate-800 font-sans pb-32">
     <div id="app" v-cloak class="p-4 max-w-[98%] mx-auto">
         
-        <!-- ヘッダーエリア -->
+        <!-- Preview Image -->
+        <img v-if="hoverImage.src" :src="hoverImage.src" class="float-preview" :style="hoverImage.style">
+
+        <!-- Header -->
         <header class="mb-4 bg-white rounded shadow-sm border border-slate-200 sticky top-0 z-30 overflow-hidden">
-            <!-- ロゴエリア -->
+            <!-- Logo Area (v16.8) -->
             <div class="bg-slate-700 p-2 flex justify-center sm:justify-start">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" class="h-20 w-auto">
-                    <!-- 背景 -->
                     <rect width="380" height="100" rx="10" fill="#334155" opacity="0"/> 
-                    
-                    <!-- マスコット -->
                     <g transform="translate(40, 20)">
                         <rect x="0" y="0" width="50" height="60" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
                         <path d="M0 8 C0 4 4 0 8 0 L42 0 C46 0 50 4 50 8 L50 15 L0 15 Z" fill="#3b82f6" opacity="0.8"/>
@@ -104,28 +91,19 @@
                         <circle cx="-5" cy="40" r="4" fill="#22c55e"/>
                         <circle cx="55" cy="30" r="4" fill="#a78bfa"/>
                     </g>
-                    
-                    <!-- ワイヤー -->
                     <path d="M95 50 C 110 50, 110 55, 125 55" class="logo-wire logo-wire-active" />
                     <circle cx="125" cy="55" r="3" fill="#a78bfa"/>
-                    
-                    <!-- 3ブロック構成 (間隔調整版) -->
                     <g transform="translate(0, 0)">
-                        <!-- Block 1: めた / META (紫) / ComfyUI -->
                         <g transform="translate(165, 0)">
                             <text x="0" y="52" class="logo-jp">めた</text>
                             <text x="0" y="75" class="logo-en fill-meta">META</text>
                             <text x="0" y="92" class="logo-sub">ComfyUI</text>
                         </g>
-
-                        <!-- Block 2: こん / Com (水色) / Metadata -->
                         <g transform="translate(240, 0)">
                             <text x="0" y="52" class="logo-jp">こん</text>
                             <text x="0" y="75" class="logo-en fill-com">Com</text>
                             <text x="0" y="92" class="logo-sub">Metadata</text>
                         </g>
-
-                        <!-- Block 3: ぴん / PNG (オレンジ) / Analyzer -->
                         <g transform="translate(315, 0)">
                             <text x="0" y="52" class="logo-jp">ぴん</text>
                             <text x="0" y="75" class="logo-en fill-png">PNG</text>
@@ -135,21 +113,17 @@
                 </svg>
             </div>
 
+            <!-- Controls -->
             <div class="p-4 flex flex-wrap justify-between items-center gap-4 border-t border-slate-200">
-                <!-- DB操作エリア & マニュアルリンク -->
                 <div class="flex items-center gap-2 border-r border-slate-200 pr-4 mr-2">
                     <button @click="triggerDbLoad" class="flex items-center gap-1 bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded text-xs transition shadow-sm">
                         📂 <span class="hidden sm:inline">DB読込</span>
                     </button>
                     <input type="file" ref="dbInput" @change="loadDB" accept=".json" class="hidden">
-                    
                     <button @click="saveDB" :disabled="images.length === 0 || loading" class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         💾 <span class="hidden sm:inline">DB保存</span>
                     </button>
-
-                    <a href="manual.html" target="_blank" class="flex items-center gap-1 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 px-3 py-1.5 rounded text-xs transition border border-slate-300 ml-2" title="操作マニュアルを開く">
-                        ❓ 使い方
-                    </a>
+                    <a href="manual.html" target="_blank" class="flex items-center gap-1 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 px-3 py-1.5 rounded text-xs transition border border-slate-300 ml-2" title="操作マニュアルを開く">❓ 使い方</a>
                 </div>
 
                 <div class="flex items-center gap-3 flex-grow" v-if="images.length > 0">
@@ -177,7 +151,7 @@
         </div>
         <div v-if="copyMessage" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded shadow-lg z-50 animate-bounce text-sm">{{ copyMessage }}</div>
 
-        <!-- メインドロップゾーン -->
+        <!-- Drop Zones -->
         <div v-if="images.length === 0" 
             @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop" 
             :class="{'drag-active': isDragging}" class="border-2 border-dashed border-slate-300 rounded-lg p-10 text-center cursor-pointer bg-white transition mb-4 min-h-[200px] flex flex-col justify-center items-center group">
@@ -185,33 +159,25 @@
             <div v-else>
                 <div class="text-5xl mb-4 group-hover:scale-110 transition duration-300">📥</div>
                 <p class="text-slate-500 text-lg mb-2 font-bold">ここにPNG画像 または JSON(DB)をドロップ</p>
-                <p class="text-slate-400 text-sm">サムネイル付きDB保存に対応しています</p>
+                <p class="text-slate-400 text-sm">ComfyUI & Stable Diffusion 対応 / サムネ付きDB保存</p>
             </div>
         </div>
-
         <div v-else 
             @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop" 
             :class="{'bg-blue-50 border-blue-400 text-blue-600 scale-[1.01] shadow-md': isDragging, 'bg-white border-slate-300 text-slate-500': !isDragging}"
             class="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition mb-4 hover:border-blue-400 hover:text-blue-600 flex justify-center items-center gap-2 duration-200">
             <span v-if="loading" class="font-bold text-blue-600 animate-pulse">処理中... ({{ processStatus }})</span>
-            <span v-else class="text-sm font-bold flex items-center gap-2">
-                <span class="text-xl">➕</span> 
-                <span>追加の画像フォルダ、またはDBをここにドロップ (画像再リンク対応)</span>
-            </span>
+            <span v-else class="text-sm font-bold flex items-center gap-2"><span class="text-xl">➕</span> 追加の画像フォルダ、またはDBをここにドロップ (画像再リンク対応)</span>
         </div>
 
-        <!-- 分析パネル (省略なし) -->
+        <!-- Analysis Panel -->
         <div v-if="images.length > 0" class="bg-white p-4 rounded shadow-sm mb-4 border border-slate-200">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="font-bold text-slate-700 text-sm flex items-center gap-2">
-                    <span>📊 分析 & フィルタ</span>
-                </h2>
-                <button @click="showAnalysis = !showAnalysis" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-100 border border-indigo-200 transition">
-                    {{ showAnalysis ? '▼ 閉じる' : '▶ フィルタパネルを開く' }}
-                </button>
+                <h2 class="font-bold text-slate-700 text-sm flex items-center gap-2"><span>📊 分析 & フィルタ</span></h2>
+                <button @click="showAnalysis = !showAnalysis" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-100 border border-indigo-200 transition">{{ showAnalysis ? '▼ 閉じる' : '▶ フィルタパネルを開く' }}</button>
             </div>
-
-            <div v-if="showAnalysis" class="mt-4 space-y-4 animate-fade-in">
+            <div v-show="showAnalysis" class="mt-4 space-y-4 animate-fade-in">
+                <!-- Tag Search -->
                 <div class="flex flex-wrap items-center gap-4 bg-slate-50 p-2 rounded border border-slate-200">
                     <div class="flex items-center gap-2 flex-grow">
                         <span class="text-xs font-bold text-slate-500">🔍 タグ検索:</span>
@@ -223,38 +189,40 @@
                     </label>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-3 rounded border border-slate-100">
-                    <div v-for="(list, key) in metadataLists" :key="key">
+                <!-- Metadata Categories -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 p-3 rounded border border-slate-100">
+                    <!-- Tool Filter (New) -->
+                    <div>
                         <div class="flex justify-between items-center border-b pb-1 mb-1">
-                            <h3 class="text-[10px] uppercase font-bold text-slate-500">{{ key }}</h3>
-                            <button v-if="key==='lora'" @click="toggleMode('lora')" class="text-[9px] px-1.5 py-0.5 rounded text-white font-bold transition"
-                                :class="filters.lora.mode === 'and' ? 'bg-blue-500' : 'bg-orange-500'">{{ filters.lora.mode.toUpperCase() }}</button>
+                            <h3 class="text-[10px] uppercase font-bold text-slate-500">TOOL</h3>
                         </div>
                         <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto content-start">
-                            <button v-for="item in list" :key="item.name" @click="toggleFilter(key, item.name)" :class="getFilterClass(key, item.name)" class="px-2 py-0.5 rounded text-[10px] btn-tag truncate max-w-full">
-                                {{ item.name }} <span class="opacity-50">({{ item.count }})</span>
-                            </button>
+                            <button v-for="item in metadataLists.tool" :key="item.name" @click="toggleFilter('tool', item.name)" :class="getFilterClass('tool', item.name)" class="px-2 py-0.5 rounded text-[10px] btn-tag truncate max-w-full">{{ item.name }} <span class="opacity-50">({{ item.count }})</span></button>
+                        </div>
+                    </div>
+                    <!-- Existing Filters -->
+                    <div v-for="(list, key) in { model: metadataLists.model, lora: metadataLists.lora, sampler: metadataLists.sampler, scheduler: metadataLists.scheduler }" :key="key">
+                        <div class="flex justify-between items-center border-b pb-1 mb-1">
+                            <h3 class="text-[10px] uppercase font-bold text-slate-500">{{ key }}</h3>
+                            <button v-if="key==='lora'" @click="toggleMode('lora')" class="text-[9px] px-1.5 py-0.5 rounded text-white font-bold transition" :class="filters.lora.mode === 'and' ? 'bg-blue-500' : 'bg-orange-500'">{{ filters.lora.mode.toUpperCase() }}</button>
+                        </div>
+                        <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto content-start">
+                            <button v-for="item in list" :key="item.name" @click="toggleFilter(key, item.name)" :class="getFilterClass(key, item.name)" class="px-2 py-0.5 rounded text-[10px] btn-tag truncate max-w-full">{{ item.name }} <span class="opacity-50">({{ item.count }})</span></button>
                         </div>
                     </div>
                 </div>
 
+                <!-- Prompt Tags -->
                 <div>
                     <div class="flex items-center gap-3 mb-2 border-b pb-1">
                         <h3 class="text-xs font-bold text-slate-600">Positive Prompt Words</h3>
-                        <button @click="toggleMode('prompt')" class="text-[10px] px-2 py-0.5 rounded text-white font-bold transition shadow-sm"
-                            :class="filters.prompt.mode === 'and' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-orange-500 hover:bg-orange-600'">
-                            条件: {{ filters.prompt.mode === 'and' ? 'AND' : 'OR' }}
-                        </button>
-                        <button @click="copyActiveTags" class="text-[10px] bg-white border border-slate-300 px-2 py-0.5 rounded hover:bg-slate-100 flex items-center gap-1" title="フィルタ中のタグをカンマ区切りでコピー">
-                            📋 タグ一覧をコピー
-                        </button>
+                        <button @click="toggleMode('prompt')" class="text-[10px] px-2 py-0.5 rounded text-white font-bold transition shadow-sm" :class="filters.prompt.mode === 'and' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-orange-500 hover:bg-orange-600'">条件: {{ filters.prompt.mode === 'and' ? 'AND' : 'OR' }}</button>
+                        <button @click="copyActiveTags" class="text-[10px] bg-white border border-slate-300 px-2 py-0.5 rounded hover:bg-slate-100 flex items-center gap-1" title="フィルタ中のタグをカンマ区切りでコピー">📋 タグ一覧をコピー</button>
                         <span v-if="tagSearchQuery" class="text-xs text-blue-600 font-bold ml-auto">"{{ tagSearchQuery }}" の検索結果</span>
                     </div>
                     <div class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-2 bg-white rounded border border-slate-200 shadow-inner">
                         <div v-for="tag in visibleTags" :key="tag.word" class="flex items-center">
-                            <button @click="toggleFilter('prompt', tag.word)" :class="getFilterClass('prompt', tag.word)" class="px-2 py-0.5 rounded-l text-xs btn-tag flex items-center gap-1 rounded-r-none border-r-0">
-                                {{ tag.word }} <span class="bg-black/5 px-1 rounded-full text-[10px]">{{ tag.count }}</span>
-                            </button>
+                            <button @click="toggleFilter('prompt', tag.word)" :class="getFilterClass('prompt', tag.word)" class="px-2 py-0.5 rounded-l text-xs btn-tag flex items-center gap-1 rounded-r-none border-r-0">{{ tag.word }} <span class="bg-black/5 px-1 rounded-full text-[10px]">{{ tag.count }}</span></button>
                             <a :href="`https://translate.google.com/?sl=en&tl=ja&text=${encodeURIComponent(tag.word)}&op=translate`" target="_blank" class="trans-btn" title="Google翻訳で開く">訳</a>
                         </div>
                         <div v-if="visibleTags.length === 0" class="text-xs text-slate-400 p-2">該当するタグはありません</div>
@@ -263,32 +231,30 @@
                 </div>
             </div>
             
+            <!-- Active Filters -->
             <div v-if="hasActiveFilters" class="mt-2 pt-2 border-t border-slate-100 flex flex-wrap gap-2 text-xs items-center">
                 <span class="font-bold text-slate-500">Filters:</span>
                 <template v-for="(states, type) in filters" :key="type">
-                    <span v-for="val in states.include" class="px-2 py-0.5 rounded border flex items-center gap-1"
-                        :class="filters[type].mode === 'and' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-orange-100 text-orange-800 border-orange-200'">
-                        {{ type }}:{{ val }} <span class="text-[9px] opacity-70 ml-0.5 font-bold">({{ filters[type].mode.toUpperCase() }})</span>
-                        <button @click="removeFilter(type, val, 'include')" class="hover:text-black font-bold ml-1">×</button>
-                    </span>
+                    <span v-for="val in states.include" class="px-2 py-0.5 rounded border flex items-center gap-1" :class="filters[type].mode === 'and' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-orange-100 text-orange-800 border-orange-200'">{{ type }}:{{ val }} <span class="text-[9px] opacity-70 ml-0.5 font-bold">({{ filters[type].mode.toUpperCase() }})</span><button @click="removeFilter(type, val, 'include')" class="hover:text-black font-bold ml-1">×</button></span>
                     <span v-for="val in states.exclude" class="bg-red-100 text-red-700 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">NOT {{ type }}:{{ val }} <button @click="removeFilter(type, val, 'exclude')" class="hover:text-red-900 font-bold">×</button></span>
                 </template>
                 <button @click="resetFilters" class="ml-auto text-slate-400 underline hover:text-red-500">全解除</button>
             </div>
         </div>
 
-        <!-- データ一覧テーブル -->
+        <!-- Data Table -->
         <div v-if="images.length > 0" class="bg-white rounded shadow-sm overflow-x-auto border border-slate-200 pb-10">
-            <table class="w-full text-left border-collapse table-fixed min-w-[1200px]">
+            <table class="w-full text-left border-collapse table-fixed min-w-[1250px]">
                 <thead class="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm text-[10px] uppercase font-bold tracking-wider">
                     <tr>
                         <th class="w-8 text-center bg-slate-50"><input type="checkbox" @change="toggleAllSelection" :checked="isAllSelected" class="align-middle"></th>
                         <th class="w-16 bg-slate-50">Thumb</th>
                         <th @click="sortBy('date')" class="w-24 sortable bg-slate-50">Date {{ getSortIcon('date') }}</th>
+                        <th @click="sortBy('tool')" class="w-12 sortable bg-slate-50 text-center">Tool {{ getSortIcon('tool') }}</th>
                         <th @click="sortBy('filename')" class="w-32 sortable bg-slate-50">File {{ getSortIcon('filename') }}</th>
                         <th @click="sortBy('model')" class="w-28 sortable bg-slate-50">Model / LoRA {{ getSortIcon('model') }}</th>
-                        <th @click="sortBy('steps')" class="w-12 sortable bg-slate-50">Stp {{ getSortIcon('steps') }}</th>
-                        <th @click="sortBy('cfg')" class="w-12 sortable bg-slate-50">CFG {{ getSortIcon('cfg') }}</th>
+                        <th @click="sortBy('steps')" class="w-10 sortable bg-slate-50">Stp {{ getSortIcon('steps') }}</th>
+                        <th @click="sortBy('cfg')" class="w-10 sortable bg-slate-50">CFG {{ getSortIcon('cfg') }}</th>
                         <th @click="sortBy('sampler')" class="w-20 sortable bg-slate-50">Sampler {{ getSortIcon('sampler') }}</th>
                         <th class="w-[30%] bg-slate-50">Positive Prompt <span class="text-[9px] normal-case font-normal ml-1 text-slate-400">(Click to Filter)</span></th>
                         <th class="w-[15%] bg-slate-50">Negative</th>
@@ -298,22 +264,18 @@
                     <tr v-for="img in filteredImages" :key="img.id" :class="{'bg-blue-50': img.isSelected, 'hover:bg-slate-50': !img.isSelected}">
                         <td class="text-center align-middle"><input type="checkbox" v-model="img.isSelected" class="w-4 h-4 rounded text-blue-600"></td>
                         <td class="align-middle p-2">
-                            <div class="thumb-wrap">
-                                <!-- 優先順位: オリジナルBlob > 埋め込みThumb > NO IMG -->
-                                <a v-if="img.blobUrl" :href="img.blobUrl" target="_blank" class="w-full h-full block">
-                                    <img :src="img.blobUrl" class="thumb-img" loading="lazy">
-                                </a>
-                                <a v-else-if="img.thumbnail" :href="img.thumbnail" target="_blank" class="w-full h-full block">
-                                    <img :src="img.thumbnail" class="thumb-img" loading="lazy">
-                                </a>
+                            <div class="thumb-wrap" @mouseenter="showPreview(img, $event)" @mousemove="movePreview($event)" @mouseleave="hidePreview">
+                                <a v-if="img.blobUrl" :href="img.blobUrl" target="_blank" class="w-full h-full block"><img :src="img.blobUrl" class="thumb-img" loading="lazy"></a>
+                                <a v-else-if="img.thumbnail" :href="img.thumbnail" target="_blank" class="w-full h-full block"><img :src="img.thumbnail" class="thumb-img" loading="lazy"></a>
                                 <div v-else class="thumb-placeholder">NO<br>IMG</div>
                             </div>
                         </td>
                         <td class="text-[10px] text-slate-500 font-mono align-middle leading-tight">{{ formatDate(img.date) }}</td>
-                        <td class="text-[10px] font-mono text-slate-500 break-all align-middle">
-                            <a v-if="img.blobUrl" :href="img.blobUrl" target="_blank" class="hover:text-blue-600 hover:underline">{{ img.filename }}</a>
-                            <span v-else>{{ img.filename }}</span>
+                        <td class="text-center align-middle" :title="img.tool">
+                            <span v-if="img.tool === 'ComfyUI'" class="text-lg">⚡</span>
+                            <span v-else class="text-lg">🖥️</span>
                         </td>
+                        <td class="text-[10px] font-mono text-slate-500 break-all align-middle"><a v-if="img.blobUrl" :href="img.blobUrl" target="_blank" class="hover:text-blue-600 hover:underline">{{ img.filename }}</a><span v-else>{{ img.filename }}</span></td>
                         <td class="align-middle">
                             <div class="font-bold text-[10px] text-slate-800 break-all">{{ img.model }}</div>
                             <div v-if="img.loras.length" class="text-[9px] text-purple-600 mt-1 leading-tight"><span v-for="l in img.loras" class="block">● {{ l }}</span></div>
@@ -329,20 +291,14 @@
                             <div class="prompt-container">
                                 <button @click="copyText(img.positive)" class="copy-btn-cell" title="全文コピー">📋</button>
                                 <div class="prompt-text-area text-[10px] text-slate-700 leading-normal" :title="img.positive">
-                                    <span v-for="(w, idx) in splitToTags(img.positive)" :key="idx" 
-                                        @click.stop="toggleFilter('prompt', w)"
-                                        class="word-btn" :class="{'active-filter': filters.prompt.include.includes(w)}">
-                                        {{ w }}<span v-if="idx < splitToTags(img.positive).length-1" class="text-slate-300 mr-1">,</span>
-                                    </span>
+                                    <span v-for="(w, idx) in img.tags" :key="idx" @click.stop="toggleFilter('prompt', w)" class="word-btn" :class="{'active-filter': filters.prompt.include.includes(w)}">{{ w }}<span v-if="idx < img.tags.length-1" class="text-slate-300 mr-1">,</span></span>
                                 </div>
                             </div>
                         </td>
                         <td class="align-top">
                             <div class="prompt-container">
                                 <button @click="copyText(img.negative)" class="copy-btn-cell" title="全文コピー">📋</button>
-                                <div class="prompt-text-area text-[10px] text-red-800 leading-normal bg-red-50/30 p-1 rounded" :title="img.negative">
-                                    {{ img.negative }}
-                                </div>
+                                <div class="prompt-text-area text-[10px] text-red-800 leading-normal bg-red-50/30 p-1 rounded" :title="img.negative">{{ img.negative }}</div>
                             </div>
                         </td>
                     </tr>
@@ -352,10 +308,10 @@
     </div>
 
     <script>
-        const { createApp, ref, computed, reactive } = Vue;
+        const { createApp, ref, computed, reactive, shallowRef } = Vue;
         createApp({
             setup() {
-                const images = ref([]);
+                const images = shallowRef([]); // Performance: Use shallowRef for large array
                 const isDragging = ref(false);
                 const loading = ref(false);
                 const processStatus = ref("");
@@ -367,11 +323,19 @@
                 const tagSearchQuery = ref("");
                 const copyMessage = ref("");
                 const dbInput = ref(null);
+                const hoverImage = reactive({ src: null, style: { top: '0px', left: '0px' } });
                 
-                const filters = reactive({ prompt: { include: [], exclude: [], mode: 'and' }, model: { include: [], exclude: [], mode: 'or' }, sampler: { include: [], exclude: [], mode: 'or' }, scheduler: { include: [], exclude: [], mode: 'or' }, lora: { include: [], exclude: [], mode: 'and' } });
+                const filters = reactive({ 
+                    prompt: { include: [], exclude: [], mode: 'and' }, 
+                    model: { include: [], exclude: [], mode: 'or' }, 
+                    tool: { include: [], exclude: [], mode: 'or' }, // Added Tool Filter
+                    sampler: { include: [], exclude: [], mode: 'or' }, 
+                    scheduler: { include: [], exclude: [], mode: 'or' }, 
+                    lora: { include: [], exclude: [], mode: 'and' } 
+                });
                 const sortState = reactive({ key: 'date', asc: false });
 
-                // --- ユーティリティ ---
+                // --- Utilities ---
                 const cleanTag = (w) => {
                     if (!w) return "";
                     let temp = w.replace(/\\\(/g, '__ESC_L__').replace(/\\\)/g, '__ESC_R__');
@@ -379,7 +343,6 @@
                     temp = temp.trim().replace(/\s+/g, '_');
                     return temp.replace(/__ESC_L__/g, '\\(').replace(/__ESC_R__/g, '\\)');
                 };
-                
                 const cleanPrompt = (t) => t ? t.replace(/ +/g, ' ').replace(/^ +/gm, '').replace(/ +$/gm, '').replace(/^\s*[\r\n]/gm, '').trim() : '';
                 const splitToTags = (text) => text ? text.replace(/[\r\n]+/g, ',').split(',').map(t => cleanTag(t)).filter(t => t) : [];
                 const formatDate = (ts) => {
@@ -387,72 +350,19 @@
                     const d = new Date(ts);
                     return `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
                 };
-                const copyText = async (text) => {
-                    if (!text) return;
-                    try { await navigator.clipboard.writeText(text); copyMessage.value = "コピーしました"; setTimeout(() => copyMessage.value = "", 1500); } 
-                    catch(e) { alert("コピーに失敗しました"); }
-                };
-                const copyActiveTags = () => {
-                    const tags = filters.prompt.include;
-                    if (tags.length === 0) { alert("タグが選択されていません"); return; }
-                    copyText(tags.join(', '));
-                };
+                const copyText = async (text) => { try { await navigator.clipboard.writeText(text); copyMessage.value = "Copied"; setTimeout(() => copyMessage.value = "", 1000); } catch(e) {} };
+                const copyActiveTags = () => copyText(filters.prompt.include.join(', '));
 
-                // --- サムネイル生成機能 ---
-                const createThumbnail = (url, maxWidth = 120) => {
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const scale = maxWidth / img.width;
-                            canvas.width = maxWidth;
-                            canvas.height = img.height * scale;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            // 品質0.6のJPEGとしてBase64化
-                            resolve(canvas.toDataURL('image/jpeg', 0.6));
-                        };
-                        img.onerror = () => resolve(null);
-                        img.src = url;
-                    });
+                // --- Preview Logic ---
+                const showPreview = (img, e) => { const src = img.blobUrl || img.thumbnail; if (!src) return; hoverImage.src = src; movePreview(e); };
+                const movePreview = (e) => {
+                    const offset = 20; let top = e.clientY + offset; let left = e.clientX + offset;
+                    if (top + 400 > window.innerHeight) top = e.clientY - 420;
+                    hoverImage.style = { top: `${top}px`, left: `${left}px` };
                 };
+                const hidePreview = () => { hoverImage.src = null; };
 
-                // --- PNG解析 ---
-                async function extractPngMetadata(file) {
-                    return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            try {
-                                const buffer = e.target.result;
-                                const view = new DataView(buffer);
-                                if (view.getUint32(0) !== 0x89504E47) { resolve(null); return; }
-                                let offset = 8;
-                                let foundJson = null;
-                                while (offset < view.byteLength) {
-                                    const length = view.getUint32(offset);
-                                    const type = String.fromCharCode(view.getUint8(offset+4), view.getUint8(offset+5), view.getUint8(offset+6), view.getUint8(offset+7));
-                                    if (type === 'tEXt' || type === 'iTXt') {
-                                        const chunkData = new Uint8Array(buffer, offset + 8, length);
-                                        const text = new TextDecoder('utf-8').decode(chunkData);
-                                        const braceIdx = text.indexOf('{');
-                                        if (braceIdx !== -1) {
-                                            const jsonCand = text.substring(braceIdx);
-                                            try {
-                                                const parsed = JSON.parse(jsonCand);
-                                                const values = Object.values(parsed);
-                                                if (values.length > 0 && values[0].class_type) { foundJson = jsonCand; break; }
-                                            } catch(e) {}
-                                        }
-                                    }
-                                    offset += 12 + length;
-                                }
-                                resolve(foundJson);
-                            } catch (err) { resolve(null); }
-                        };
-                        reader.readAsArrayBuffer(file);
-                    });
-                }
-
+                // --- Image Parsing Logic ---
                 function resolveValue(data, value, keyToFind = 'seed') {
                     if (Array.isArray(value) && value.length === 2) {
                         const targetNode = data[String(value[0])];
@@ -473,7 +383,8 @@
                         const data = JSON.parse(jsonStr);
                         let meta = { 
                             id: Math.random().toString(36), filename: file.name, date: file.lastModified,
-                            blobUrl: null, thumbnail: null, isSelected: false, model: '-', loras: [], seed: '-', steps: '-', cfg: '-', sampler: '-', scheduler: '-', positive: '', negative: '' 
+                            tool: 'ComfyUI', // Tool Flag
+                            blobUrl: null, thumbnail: null, isSelected: false, model: '-', loras: [], seed: '-', steps: '-', cfg: '-', sampler: '-', scheduler: '-', positive: '', negative: '', tags: []
                         };
                         const allNodes = Object.values(data);
                         let mainSampler = null;
@@ -485,14 +396,8 @@
                             const inp = mainSampler.inputs;
                             meta.steps = inp.steps; meta.cfg = inp.cfg; meta.sampler = inp.sampler_name; meta.scheduler = inp.scheduler;
                             meta.seed = resolveValue(data, inp.seed, 'seed');
-                            if (typeof meta.seed === 'object' || meta.seed === undefined) meta.seed = resolveValue(data, inp.noise_seed, 'seed');
-                            if (typeof meta.seed === 'object' || meta.seed === undefined) meta.seed = resolveValue(data, inp.seed_num, 'seed');
-                        } else {
-                            allNodes.forEach(node => {
-                                const inp = node.inputs || {};
-                                if (inp.seed && typeof inp.seed !== 'object') meta.seed = inp.seed;
-                                if (inp.steps && typeof inp.steps !== 'object') meta.steps = inp.steps;
-                            });
+                            if (!meta.seed && meta.seed !== 0) meta.seed = resolveValue(data, inp.noise_seed, 'seed');
+                            if (!meta.seed && meta.seed !== 0) meta.seed = resolveValue(data, inp.seed_num, 'seed');
                         }
                         allNodes.forEach(node => {
                             const inp = node.inputs || {};
@@ -519,11 +424,102 @@
                         if (uniqueTexts.length > 1) meta.negative = cleanPrompt(uniqueTexts[1]);
                         if (meta.model !== '-') meta.model = meta.model.replace(/\\/g, '/').split('/').pop();
                         meta.loras = meta.loras.map(l => l.replace(/\\/g, '/').split('/').pop());
+                        meta.tags = splitToTags(meta.positive); // Pre-calculate tags for speed
                         return meta;
                     } catch (e) { return null; }
                 }
 
-                // --- ハンドリング ---
+                function parseSDMetadata(text, file) {
+                    try {
+                        let meta = { 
+                            id: Math.random().toString(36), filename: file.name, date: file.lastModified,
+                            tool: 'Stable Diffusion', // Tool Flag
+                            blobUrl: null, thumbnail: null, isSelected: false, model: '-', loras: [], seed: '-', steps: '-', cfg: '-', sampler: '-', scheduler: '-', positive: '', negative: '', tags: []
+                        };
+                        
+                        const parts = text.split('Negative prompt:');
+                        meta.positive = cleanPrompt(parts[0]);
+                        let remaining = '';
+                        
+                        if (parts.length > 1) {
+                            const secondPart = parts[1].split('Steps:');
+                            meta.negative = cleanPrompt(secondPart[0]);
+                            remaining = 'Steps:' + (secondPart[1] || '');
+                        } else {
+                            const p2 = text.split('Steps:');
+                            if (p2.length > 1) remaining = 'Steps:' + p2[1];
+                        }
+
+                        // Extract params
+                        const getVal = (k) => { const r = new RegExp(k + ': ([^,]+)'); const m = remaining.match(r); return m ? m[1].trim() : '-'; };
+                        meta.steps = getVal('Steps');
+                        meta.sampler = getVal('Sampler');
+                        meta.cfg = getVal('CFG scale');
+                        meta.seed = getVal('Seed');
+                        meta.model = getVal('Model');
+                        
+                        // Extract LoRAs from prompt (e.g. <lora:name:1>)
+                        const loraMatches = meta.positive.match(/<lora:([^:>]+):/g);
+                        if (loraMatches) {
+                            meta.loras = loraMatches.map(m => m.slice(6, -1));
+                        }
+                        
+                        meta.tags = splitToTags(meta.positive);
+                        return meta;
+                    } catch(e) { return null; }
+                }
+
+                async function extractAndParse(file) {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const buffer = e.target.result;
+                                const view = new DataView(buffer);
+                                if (view.getUint32(0) !== 0x89504E47) { resolve(null); return; }
+                                
+                                let offset = 8;
+                                while (offset < view.byteLength) {
+                                    const length = view.getUint32(offset);
+                                    const type = String.fromCharCode(view.getUint8(offset+4), view.getUint8(offset+5), view.getUint8(offset+6), view.getUint8(offset+7));
+                                    
+                                    if (type === 'tEXt' || type === 'iTXt') {
+                                        const chunkData = new Uint8Array(buffer, offset + 8, length);
+                                        const text = new TextDecoder('utf-8').decode(chunkData);
+                                        
+                                        // 1. Check for ComfyUI JSON
+                                        if (text.includes('{"') || text.includes('prompt')) { // Loose check
+                                            const braceIdx = text.indexOf('{');
+                                            if (braceIdx !== -1) {
+                                                const jsonCand = text.substring(braceIdx);
+                                                try {
+                                                    const parsed = JSON.parse(jsonCand);
+                                                    // Simple check if it looks like node graph or prompt
+                                                    if (Object.values(parsed).some(v => v.class_type || v.inputs)) {
+                                                        const res = parseComfyTrace(jsonCand, file);
+                                                        if (res) { resolve(res); return; }
+                                                    }
+                                                } catch(e) {}
+                                            }
+                                        }
+                                        
+                                        // 2. Check for SD Parameters
+                                        if (text.startsWith('parameters\0') || text.includes('Negative prompt:') || text.includes('Steps:')) {
+                                            const cleanText = text.replace(/^parameters\0/, '');
+                                            const res = parseSDMetadata(cleanText, file);
+                                            if (res) { resolve(res); return; }
+                                        }
+                                    }
+                                    offset += 12 + length;
+                                }
+                                resolve(null);
+                            } catch (err) { resolve(null); }
+                        };
+                        reader.readAsArrayBuffer(file);
+                    });
+                }
+
+                // --- Handlers ---
                 const handleDrop = async (e) => {
                     isDragging.value = false; errorMessage.value = "";
                     const items = Array.from(e.dataTransfer.files);
@@ -533,121 +529,116 @@
                     if (pngFiles.length === 0 && jsonFiles.length === 0) return;
                     loading.value = true;
                     
-                    // JSON処理
+                    const newImages = [];
+
+                    // JSON Load
                     for (const f of jsonFiles) {
                         processStatus.value = `DB読込: ${f.name}`;
                         try {
                             const text = await f.text();
                             const dbData = JSON.parse(text);
                             if (Array.isArray(dbData)) {
-                                const restored = dbData.map(d => ({ ...d, id: Math.random().toString(36), blobUrl: null, isSelected: false }));
-                                images.value.push(...restored);
+                                const restored = dbData.map(d => ({ ...d, id: Math.random().toString(36), blobUrl: null, isSelected: false, tags: d.tags || splitToTags(d.positive) })); // Ensure tags exist
+                                newImages.push(...restored);
                             }
-                        } catch(err) { errorMessage.value = `JSON読み込みエラー: ${f.name}`; }
+                        } catch(err) { errorMessage.value = `JSONエラー: ${f.name}`; }
                     }
 
-                    // PNG処理 (重複チェックして、既存ならblobUrl更新、新規なら追加)
-                    let successCount = 0;
+                    // PNG Parse
                     for (let i = 0; i < pngFiles.length; i++) {
                         processStatus.value = `解析: ${i + 1} / ${pngFiles.length}`;
                         const file = pngFiles[i];
-                        
-                        // 既存チェック（ファイル名が一致するものがあるか）
-                        const existingIdx = images.value.findIndex(img => img.filename === file.name);
-                        
-                        if (existingIdx !== -1) {
-                            // 既存がある場合、blobUrlだけ更新してサムネを高画質化
-                            images.value[existingIdx].blobUrl = URL.createObjectURL(file);
-                            successCount++;
-                        } else {
-                            // 新規解析
-                            const jsonStr = await extractPngMetadata(file);
-                            if (jsonStr) {
-                                const meta = parseComfyTrace(jsonStr, file);
-                                if (meta) { meta.blobUrl = URL.createObjectURL(file); images.value.push(meta); successCount++; }
-                            }
+                        // 重複チェックは後回しにして高速化
+                        const meta = await extractAndParse(file);
+                        if (meta) {
+                            meta.blobUrl = URL.createObjectURL(file);
+                            newImages.push(meta);
                         }
                     }
+
+                    // Merge and deduplicate logic could go here, but simply pushing for speed now.
+                    // If file exists, update blobUrl
+                    const currentMap = new Map(images.value.map(i => [i.filename, i]));
+                    for (const img of newImages) {
+                        if (currentMap.has(img.filename)) {
+                            const existing = currentMap.get(img.filename);
+                            if (img.blobUrl) existing.blobUrl = img.blobUrl;
+                        } else {
+                            images.value = [...images.value, img]; // Shallow ref update triggers view
+                        }
+                    }
+                    
                     loading.value = false; processStatus.value = "";
                 };
 
-                // --- DB保存 (サムネ生成付き) ---
                 const saveDB = async () => {
-                    if (images.value.length === 0) return;
+                    const targets = filteredImages.value;
+                    if (targets.length === 0) return;
+                    if (!confirm(`${targets.length}件のデータを保存しますか？`)) return;
                     loading.value = true;
                     const dbData = [];
-                    
-                    for (let i = 0; i < images.value.length; i++) {
-                        processStatus.value = `保存準備: ${i + 1} / ${images.value.length}`;
-                        const img = images.value[i];
-                        // 必要なデータだけ抽出
+                    for (let i = 0; i < targets.length; i++) {
+                        processStatus.value = `保存中: ${i + 1}`;
+                        const img = targets[i];
                         const data = { ...img };
                         delete data.id; delete data.blobUrl; delete data.isSelected;
-                        
-                        // サムネがまだ無く、かつBlobがある場合のみ生成
-                        if (!data.thumbnail && img.blobUrl) {
-                            data.thumbnail = await createThumbnail(img.blobUrl);
-                        }
+                        if (!data.thumbnail && img.blobUrl) data.thumbnail = await createThumbnail(img.blobUrl);
                         dbData.push(data);
                     }
-
                     const blob = new Blob([JSON.stringify(dbData)], { type: "application/json" });
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `comfy_db_thumb_${new Date().toISOString().slice(0,10)}.json`;
-                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `comfy_db_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
                     loading.value = false; processStatus.value = "";
                 };
 
+                const loadDB = async (e) => handleDrop({ dataTransfer: { files: e.target.files } }); // Reuse logic
                 const triggerDbLoad = () => dbInput.value.click();
-                const loadDB = async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    loading.value = true; processStatus.value = "DB展開中...";
-                    try {
-                        const text = await file.text();
-                        const dbData = JSON.parse(text);
-                        if (Array.isArray(dbData)) {
-                            const restored = dbData.map(d => ({ ...d, id: Math.random().toString(36), blobUrl: null, isSelected: false }));
-                            images.value.push(...restored);
-                            e.target.value = '';
-                        }
-                    } catch(err) { errorMessage.value = "DB読み込み失敗"; }
-                    loading.value = false; processStatus.value = "";
-                };
 
-                // --- 共通 ---
-                const clearAll = () => { images.value.forEach(img => { if (img.blobUrl) URL.revokeObjectURL(img.blobUrl); }); images.value = []; resetFilters(); showAnalysis.value = false; filterBySelection.value = false; };
-                const toggleFilter = (type, value) => { const inc = filters[type].include; const exc = filters[type].exclude; if (inc.includes(value)) { filters[type].include = inc.filter(v => v !== value); filters[type].exclude.push(value); } else if (exc.includes(value)) { filters[type].exclude = exc.filter(v => v !== value); } else { filters[type].include.push(value); } };
-                const removeFilter = (t, v, m) => { filters[t][m] = filters[t][m].filter(val => val !== v); };
+                // UI Helpers
+                const clearAll = () => { images.value.forEach(i => i.blobUrl && URL.revokeObjectURL(i.blobUrl)); images.value = []; resetFilters(); };
                 const resetFilters = () => { for(let k in filters) { filters[k].include=[]; filters[k].exclude=[]; } };
-                const toggleMode = (type) => { filters[type].mode = filters[type].mode === 'and' ? 'or' : 'and'; };
-                const getFilterClass = (t, v) => { if (filters[t].include.includes(v)) return filters[t].mode === 'and' ? 'state-include' : 'state-include-or'; if (filters[t].exclude.includes(v)) return 'state-exclude'; return 'state-off'; };
+                const toggleFilter = (t, v) => { 
+                    const f = filters[t]; 
+                    if (f.include.includes(v)) { f.include = f.include.filter(x=>x!==v); f.exclude.push(v); }
+                    else if (f.exclude.includes(v)) { f.exclude = f.exclude.filter(x=>x!==v); }
+                    else { f.include.push(v); }
+                };
+                const removeFilter = (t, v, m) => { filters[t][m] = filters[t][m].filter(x=>x!==v); };
+                const toggleMode = (t) => { filters[t].mode = filters[t].mode === 'and' ? 'or' : 'and'; };
+                const getFilterClass = (t, v) => filters[t].include.includes(v) ? (filters[t].mode==='and'?'state-include':'state-include-or') : (filters[t].exclude.includes(v)?'state-exclude':'state-off');
+                const hasActiveFilters = computed(() => Object.values(filters).some(f => f.include.length || f.exclude.length));
 
-                const hasActiveFilters = computed(() => Object.values(filters).some(f => f.include.length > 0 || f.exclude.length > 0));
-                
+                // Optimized Filtering
                 const filteredImages = computed(() => {
                     let result = images.value;
-                    if (filterBySelection.value) result = result.filter(img => img.isSelected);
+                    if (filterBySelection.value) result = result.filter(i => i.isSelected);
                     if (hasActiveFilters.value) {
                         result = result.filter(img => {
-                            const check = (val, f) => (f.include.length===0 || f.include.includes(val)) && !f.exclude.includes(val);
-                            const checkArr = (arr, f) => {
-                                const isAnd = f.mode === 'and';
-                                if (f.include.length > 0) { if (isAnd && !f.include.every(v => arr.includes(v))) return false; if (!isAnd && !f.include.some(v => arr.includes(v))) return false; }
-                                if (f.exclude.some(v => arr.includes(v))) return false; return true;
-                            };
-                            const checkTxt = (txt, f) => {
-                                const tags = splitToTags(txt);
-                                const isAnd = f.mode === 'and';
-                                if (f.include.length > 0) {
-                                    if (isAnd && !f.include.every(target => tags.includes(target))) return false;
-                                    if (!isAnd && !f.include.some(target => tags.includes(target))) return false;
-                                }
-                                if (f.exclude.some(target => tags.includes(target))) return false;
-                                return true;
-                            };
-                            return checkTxt(img.positive, filters.prompt) && check(img.model, filters.model) && check(img.sampler, filters.sampler) && check(img.scheduler, filters.scheduler) && checkArr(img.loras, filters.lora);
+                            // Check Tool
+                            const ft = filters.tool;
+                            if (ft.include.length && !ft.include.includes(img.tool)) return false;
+                            if (ft.exclude.includes(img.tool)) return false;
+
+                            // Check Model, Sampler, Scheduler
+                            if (filters.model.include.length && !filters.model.include.includes(img.model)) return false;
+                            if (filters.model.exclude.includes(img.model)) return false;
+                            
+                            // Check LoRAs (Array)
+                            const fl = filters.lora;
+                            if (fl.include.length) {
+                                const match = fl.mode === 'and' ? fl.include.every(v => img.loras.includes(v)) : fl.include.some(v => img.loras.includes(v));
+                                if (!match) return false;
+                            }
+                            if (fl.exclude.some(v => img.loras.includes(v))) return false;
+
+                            // Check Prompt Tags (Optimized: use pre-calculated img.tags)
+                            const fp = filters.prompt;
+                            if (fp.include.length) {
+                                const match = fp.mode === 'and' ? fp.include.every(t => img.tags.includes(t)) : fp.include.some(t => img.tags.includes(t));
+                                if (!match) return false;
+                            }
+                            if (fp.exclude.some(t => img.tags.includes(t))) return false;
+
+                            return true;
                         });
                     }
                     if (sortState.key) {
@@ -660,30 +651,49 @@
                     return result;
                 });
 
-                const targetImagesForTags = computed(() => (showAllTags.value || tagSearchQuery.value) ? images.value : filteredImages.value);
-                const createCounts = (source, key, isArr=false, clean=false) => { const c = {}; source.forEach(img => { if (isArr) { img[key].forEach(v => { if(v) c[v]=(c[v]||0)+1; }); } else if (clean) { if(img[key]) img[key].split(',').map(cleanTag).forEach(t => { if(t) c[t]=(c[t]||0)+1; }); } else { if(img[key] && img[key]!=='-') c[img[key]]=(c[img[key]]||0)+1; } }); return Object.entries(c).map(([n, count]) => ({name:n, word:n, count})).sort((a,b)=>b.count-a.count); };
+                // Aggregations
+                const createCounts = (source, key, isArr=false) => { 
+                    const c = {}; 
+                    source.forEach(img => { 
+                        if (isArr) img[key].forEach(v => { if(v) c[v]=(c[v]||0)+1; });
+                        else if (img[key] && img[key]!=='-') c[img[key]]=(c[img[key]]||0)+1; 
+                    }); 
+                    return Object.entries(c).map(([n, count]) => ({name:n, count})).sort((a,b)=>b.count-a.count); 
+                };
                 
-                const tagList = computed(() => createCounts(targetImagesForTags.value, 'positive', false, true));
+                const metadataLists = computed(() => ({
+                    tool: createCounts(filteredImages.value, 'tool'),
+                    model: createCounts(filteredImages.value, 'model'),
+                    lora: createCounts(filteredImages.value, 'loras', true),
+                    sampler: createCounts(filteredImages.value, 'sampler'),
+                    scheduler: createCounts(filteredImages.value, 'scheduler')
+                }));
+
+                const tagList = computed(() => {
+                    const c = {};
+                    const targets = (showAllTags.value || tagSearchQuery.value) ? images.value : filteredImages.value;
+                    targets.forEach(img => img.tags.forEach(t => c[t] = (c[t]||0)+1));
+                    return Object.entries(c).map(([w, count]) => ({word:w, count})).sort((a,b)=>b.count-a.count);
+                });
+
                 const visibleTags = computed(() => {
                     let list = tagList.value;
                     if (tagSearchQuery.value) { const q = tagSearchQuery.value.toLowerCase(); list = list.filter(t => t.word.toLowerCase().includes(q)); }
                     else if (tagsLimited.value) { list = list.slice(0, 100); }
                     return list;
                 });
-                
-                const metadataLists = computed(() => ({ model: createCounts(filteredImages.value, 'model'), lora: createCounts(filteredImages.value, 'loras', true), sampler: createCounts(filteredImages.value, 'sampler'), scheduler: createCounts(filteredImages.value, 'scheduler') }));
+
                 const selectedCount = computed(() => images.value.filter(i => i.isSelected).length);
                 const isAllSelected = computed(() => filteredImages.value.length > 0 && filteredImages.value.every(i => i.isSelected));
-                
                 const toggleAllSelection = (e) => { const val = e.target.checked; filteredImages.value.forEach(img => img.isSelected = val); };
-                const copySelected = async () => { const targets = images.value.filter(i => i.isSelected); if (targets.length === 0) return; const text = targets.map(img => `File: ${img.filename}\nModel: ${img.model}\nSeed: ${img.seed} | Steps: ${img.steps} | CFG: ${img.cfg}\nPrompt: ${img.positive}\nNegative: ${img.negative}\n---`).join('\n'); copyText(text); };
-                const generateCSV = (targets) => { const bom = new Uint8Array([0xEF, 0xBB, 0xBF]); let csv = "Filename,Date,Model,LoRA,Seed,Steps,CFG,Sampler,Scheduler,Positive,Negative\n"; targets.forEach(img => { csv += [ img.filename, formatDate(img.date), img.model, img.loras.join('|'), img.seed, img.steps, img.cfg, img.sampler, img.scheduler, `"${(img.positive||'').replace(/"/g, '""')}"`, `"${(img.negative||'').replace(/"/g, '""')}"` ].join(",") + "\n"; }); const blob = new Blob([bom, csv], { type: "text/csv;charset=utf-8;" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "comfy_metadata.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+                const copySelected = async () => { const targets = images.value.filter(i => i.isSelected); if (!targets.length) return; const text = targets.map(img => `File: ${img.filename}\nTool: ${img.tool}\nModel: ${img.model}\nSeed: ${img.seed}\nPrompt: ${img.positive}\nNegative: ${img.negative}\n---`).join('\n'); copyText(text); };
+                const generateCSV = (targets) => { const bom = new Uint8Array([0xEF, 0xBB, 0xBF]); let csv = "Filename,Tool,Date,Model,LoRA,Seed,Steps,CFG,Sampler,Positive,Negative\n"; targets.forEach(img => { csv += [ img.filename, img.tool, formatDate(img.date), img.model, img.loras.join('|'), img.seed, img.steps, img.cfg, img.sampler, `"${(img.positive||'').replace(/"/g, '""')}"`, `"${(img.negative||'').replace(/"/g, '""')}"` ].join(",") + "\n"; }); const blob = new Blob([bom, csv], { type: "text/csv;charset=utf-8;" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "metadata.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
                 const exportCSV = () => generateCSV(filteredImages.value);
                 const exportSelectedCSV = () => generateCSV(images.value.filter(i => i.isSelected));
                 const sortBy = (key) => { if (sortState.key === key) sortState.asc = !sortState.asc; else { sortState.key = key; sortState.asc = true; } };
                 const getSortIcon = (key) => sortState.key!==key ? '↕' : (sortState.asc ? '▲' : '▼');
 
-                return { images, isDragging, loading, processStatus, errorMessage, showAnalysis, tagsLimited, filterBySelection, selectedCount, isAllSelected, copyMessage, handleDrop, clearAll, tagList, visibleTags, metadataLists, filters, hasActiveFilters, toggleFilter, removeFilter, resetFilters, getFilterClass, filteredImages, sortBy, getSortIcon, toggleAllSelection, copySelected, exportCSV, exportSelectedCSV, toggleMode, formatDate, splitToTags, showAllTags, tagSearchQuery, copyText, copyActiveTags, dbInput, saveDB, loadDB, triggerDbLoad };
+                return { images, isDragging, loading, processStatus, errorMessage, showAnalysis, tagsLimited, filterBySelection, selectedCount, isAllSelected, copyMessage, handleDrop, clearAll, tagList, visibleTags, metadataLists, filters, hasActiveFilters, toggleFilter, removeFilter, resetFilters, getFilterClass, filteredImages, sortBy, getSortIcon, toggleAllSelection, copySelected, exportCSV, exportSelectedCSV, toggleMode, formatDate, splitToTags, showAllTags, tagSearchQuery, copyText, copyActiveTags, dbInput, saveDB, loadDB, triggerDbLoad, hoverImage, showPreview, movePreview, hidePreview };
             }
         }).mount('#app');
     </script>
